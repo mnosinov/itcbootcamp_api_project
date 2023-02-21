@@ -31,13 +31,13 @@ function createRecipesGrid({ meals }) {
 		recipesList.innerHTML = "Recipes not found";
 	}
 }
-
+/* interesting function N.B. - int! --------*/
 function getValueByKey(meal, keyField) {
-	const arrFromObj = Object.entries(meal)
-	const allIngredients = arrFromObj.filter(([key,value]) => {
-		return key.includes(keyField.trim()) && value !== ''
-	}).filter(([_,val]) => val !==null).map(([_, val]) => val)
-	return allIngredients
+	const arrFromObj = Object.entries(meal);
+	const allIngredients = arrFromObj.filter( ([key, value]) => {
+		return key.includes(keyField.trim()) && value !== '';
+	}).filter( ([_, value]) => value !==null).map( ([_, value]) => value);
+	return allIngredients;
 }
 
 async function openModal(id) {
