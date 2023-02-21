@@ -32,12 +32,56 @@ function createRecipesGrid({ meals }) {
 	}
 }
 
+function getValueByKey(meal, keyField) {
+	const arrFromObj = Object.entries(meal)
+	const allIngredients = arrFromObj.filter(([key,value]) => {
+		return key.includes(keyField.trim()) && value !== ''
+	}).filter(([_,val]) => val !==null).map(([_, val]) => val)
+	return allIngredients
+}
+
 async function openModal(id) {
 	modal.style.display = 'flex';
 	const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
-	const {meals} = await res.json();
+
+	const { meals } = await res.json();
 	const [meal] = meals;
-	console.log(meal);
+	const { strMeal, strMealThumb, strInstructions, strYoutube } = meal;
+
+	const ingredients = getValueByKey(meal, "strIngredient");
+	const measures = getValueByKey(meal, "strMeasure");
+	console.log(ingredients);
+	console.log(measures);
+
+	modal.innerHTML = `
+		<div class="modal-container">
+			<button onclick="closeModal()" class=close-btn>
+				<i class="fa fa-times" aria-hidden="true"></i>
+			</button>
+			<div class="left-part">
+				<img src="${meal.strMealThumb}" alt="Meal Image Thumb">
+			</div>
+			<div class="right-part">
+				<h2 class="right-part_header">${strMeal}</h2>
+				<p class="right-part_instructions">${strInstructions}</p>
+				<div class=ingredients-measurements-comtainer>
+					<ul class=ingredients></ul>
+					<ul class=measures></ul>
+				</div>
+				${strYoutube && `<a class="watch-video" href=${strYoutube} target=_black>watch video</a>`}
+			</div>
+		</div>
+	`;
+	const ingredientsEl = modal.querySelector(".ingredients");
+	const measuresEl = modal.querySelector(".measures");
+	for (let i = 0; i < ingredients.length; i++) {
+		const ingredient = ingredients[i];
+		ingredientsEl.innerHTML += `<li>${ingredient}</li>`;
+	}
+	for (let i = 0; i < measures.length; i++) {
+		const measure = measures[i];
+		measuresEl.innerHTML += `<li>${measure}</li>`;
+	}
 }
 
 async function getRecepies() {
@@ -46,4 +90,8 @@ async function getRecepies() {
 	const data = await res.json();
 	createRecipesGrid(data);
 	searchInput.value = "";
+}
+
+function closeModal() {
+	modal.style.display = "none";
 }
